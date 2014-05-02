@@ -325,9 +325,6 @@ disk space.  Most of the code relevant to this document resides under
 \texttt{sys/rump}, but relevant code can be found under other paths as
 well, such as \texttt{tests} and \texttt{lib}.
 
-Diffs in Appendix~C detail where the above source tree differs
-from the discussion in this dissertation.
-
 The project was done in small increments in the NetBSD source with
 almost daily changes.  The commits are available for study from
 repository provided by the NetBSD project, \eg via the web interface
@@ -373,12 +370,3 @@ of each such example.
 Unix-style manual pages for interfaces described in this dissertation
 are available in Appendix A.  The manual pages are taken verbatim
 from the NetBSD 5.99.48 distribution.
-
-\subsubsection{Tutorial}
-
-Appendix B contains a hands-on tutorial.  It walks through various
-use cases where drivers are virtualized, such as encrypting a file
-system image using the kernel crypto driver and running applications
-against virtual userspace TCP/IP stacks.  The tutorial uses standard
-applications and does not require writing code or compiling special
-binaries.

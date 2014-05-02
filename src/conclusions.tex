@@ -107,11 +107,7 @@ tree without relying on in-kernel drivers.  Due to the new ability of
 being able to reuse the kernel file system drivers directly in
 applications, our reimplementation was done in under 6\% of the
 time the original implementation required.  In other words, it
-required days instead of weeks to implement.  For another example
-of using a rump kernel in an application, see
-Appendix~\ref{sect:cgdencrypt} where using the in-kernel crypto
-driver for creating an encrypted disk image is explained
-using binaries available on an out-of-the-box NetBSD installation.
+required days instead of weeks to implement.
 
 For testing and development we added close to 1,000 test cases using rump
 kernels as the test backends.  The test suite is run against daily NetBSD
