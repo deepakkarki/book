@@ -1,7 +1,7 @@
 #	$Id: Makefile,v 1.14 2012/01/31 21:52:47 pooka Exp $
 #
 
-PAPER=	diss
+PAPER=	rumpkernel
 
 SUBS=	introduction.tex
 SUBS+=	concept.tex
@@ -33,6 +33,6 @@ man.tex: manpages/makemanappendix.sh
 	(cd manpages ; sh makemanappendix.sh) > man.tex
 
 clean:
-	rm -f dummy *aux *bbl *blg *dvi *log *.ps *lof *lot *.toc *.ilg *.nls *.nlo ${PAPER}.pdf diss.pdf *.mof currevs.tex inputs.tex man.tex ${PAPER}.out
+	rm -f dummy *aux *bbl *blg *dvi *log *.ps *lof *lot *.toc *.ilg *.nls *.nlo ${PAPER}.pdf *.mof currevs.tex inputs.tex man.tex ${PAPER}.out
 
 cleandir: clean
