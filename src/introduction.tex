@@ -16,7 +16,7 @@ name says, contains the most fundamental routines of the operating
 system.  In addition to low-level platform support and critical
 functionality such as thread scheduling and IPC, the kernel offers
 \textit{drivers}, which abstract an underlying entity.  Throughout this
-dissertation we will use the term \textit{driver} in an extended sense
+book we will use the term \textit{driver} in an extended sense
 which encompasses not only hardware device drivers, but additionally
 for example file system drivers and the TCP/IP network driver.
 
@@ -45,7 +45,7 @@ Therefore, even a monolithic kernel tends towards structure.
 
 Despite its widespread popularity, we identified a number of
 suboptimal characteristics in monolithic kernels which we consider
-as the motivating problems for this dissertation:
+as the motivating problems:
 
 \begin{enumerate}
 \item   \textbf{Weak security and robustness}.
@@ -194,7 +194,7 @@ hosted on is called the host platform or \textit{host}.
 
 At runtime, a rump kernel can assume the role of an application library
 or that of a server.  Programs requesting services from rump kernels
-are called rump kernel clients.  Throughout this dissertation we use
+are called rump kernel clients.  Throughout this book we use
 the shorthand \textit{client} to denote rump kernel clients.
 We define three client types.
 
@@ -280,7 +280,7 @@ The original contributions of this dissertation are as follows:
 	extended to other operating systems.
 \end{enumerate}
 
-\subsection{Dissertation Outline}
+\subsection{Book Outline}
 
 \chapref{concept} defines the concept of an anykernel and explains
 rump kernels.
@@ -295,7 +295,7 @@ microbenchmarks as supporting evidence for implementation decisions.
 \subsubsection{Source Code}
 \label{sect:src}
 
-The implementation discussed in this dissertation can be found in
+The implementation discussed in this book can be found in
 source code form from the NetBSD CVS tree as of March 31st 2011
 23:59UTC.
 
@@ -330,14 +330,14 @@ at \texttt{cvsweb.NetBSD.org}.
 
 \subsubsection*{NetBSD Release Model}
 
-We use NetBSD release cycle terminology throughout this dissertation.
+We use NetBSD release cycle terminology throughout this book.
 The following contains an explanation of the NetBSD release model.
 It is a synopsis of the information located at
 \texttt{http://www.NetBSD.org/releases/release-map.html}.
 
 The main development branch or \textit{HEAD} of NetBSD is known as
 \textit{NetBSD-current} or, if NetBSD is implied, simply
-\textit{-current}.  The source code used in this dissertation is
+\textit{-current}.  The source code used in this book is
 therefore -current from the aforementioned date.
 
 Release branches are created from -current and are known by their
@@ -352,12 +352,12 @@ A -current snapshot contains a kernel API/ABI version.  The version is
 incremented only when an interface changes.  The kernel version
 corresponding to March 31st is 5.99.48.  While this version number
 stands for any -current snapshot between March~9th and April~11th~2011,
-whenever 5.99.48 is used in this dissertation, it stands for -current
+whenever 5.99.48 is used in this book, it stands for -current
 at 20110331.
 
 \subsubsection*{Code examples}
 
-This dissertation includes code examples from the NetBSD source
+This book includes code examples from the NetBSD source
 tree.  All such examples are copyright of their respective owners
 and are not public domain.  If pertinent, please check the full
 source for further information about the licensing and copyright
