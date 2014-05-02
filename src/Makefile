@@ -13,13 +13,8 @@ SUBS+=	conclusions.tex
 all: ${PAPER}.ps
 	
 ${PAPER}.ps: ${PAPER}.tex thebibs.bib
-	rm -f currevs.tex inputs.tex ${PAPER}.pdf
+	rm -f inputs.tex ${PAPER}.pdf
 
-	echo '\begin{verbatim}' > currevs.tex
-	for s in diss.tex ${SUBS} ; do \
-		sed -ne 's/[%$$]//gp;q' < $${s} >> currevs.tex ; \
-	done
-	echo '\end{verbatim}' >> currevs.tex
 	for s in ${SUBS}; do \
 		echo \\input{$${s}} >> inputs.tex ; \
 	done
@@ -30,6 +25,6 @@ ${PAPER}.ps: ${PAPER}.tex thebibs.bib
 	pdflatex ${PAPER}.tex
 
 clean:
-	rm -f dummy *aux *bbl *blg *dvi *log *.ps *lof *lot *.toc *.ilg *.nls *.nlo ${PAPER}.pdf *.mof currevs.tex inputs.tex ${PAPER}.out
+	rm -f dummy *aux *bbl *blg *dvi *log *.ps *lof *lot *.toc *.ilg *.nls *.nlo ${PAPER}.pdf *.mof inputs.tex ${PAPER}.out
 
 cleandir: clean
