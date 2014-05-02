@@ -295,65 +295,29 @@ microbenchmarks as supporting evidence for implementation decisions.
 \subsubsection{Source Code}
 \label{sect:src}
 
-The implementation discussed in this book can be found in
-source code form from the NetBSD CVS tree as of March 31st 2011
-23:59UTC.
+The basis of rump kernels is formed by the NetBSD operating system.
+For example, the majority of the drivers and the general infrastructure
+is directly used from the NetBSD source repository.
+The NetBSD files histories are available for study from repository
+provided by the NetBSD project, \eg via the web interface at
+\texttt{cvsweb.NetBSD.org}.
 
-NetBSD is an evolving open source project with hundreds of volunteers
-and continuous change.  \textit{Any statement we make about NetBSD
-reflects solely the above timestamp and no other}.  It is most
-likely that statements will apply over a wide period of time, but
-it is up to the interested reader to verify if they apply to earlier
-or later dates.
+Additionally, there is infrastructure to support building rump kernels
+for various platforms, hosted at \texttt{http://repo.rumpkernel.org/}.
 
-It is possible to retrieve the source tree with the following command:
-{\small
+The easiest way to fetch the NetBSD source code is to run the following
+commands:
+
 \begin{verbatim}
-cvs -d anoncvs@anoncvs.netbsd.org:/cvsroot co -D'20110331 2359UTC' src
-\end{verbatim}}
+git clone http://repo.rumpkernel.org/buildrump.sh
+cd buildrump.sh
+./buildrump.sh checkout
+\end{verbatim}
 
-Whenever we refer to source file, we implicitly assume
-the \texttt{src} directory to be a part of the path, \ie
-\verb+sys/kern/init_main.c+ means \verb+src/sys/kern/init_main.c+.
-
-For simplicity, the above command checks out the entire NetBSD
-operating system source tree instead of attempting to cherry-pick only
-the relevant code.  The checkout will require approximately 1.1GB of
-disk space.  Most of the code relevant to this document resides under
-\texttt{sys/rump}, but relevant code can be found under other paths as
-well, such as \texttt{tests} and \texttt{lib}.
-
-The project was done in small increments in the NetBSD source with
-almost daily changes.  The commits are available for study from
-repository provided by the NetBSD project, \eg via the web interface
-at \texttt{cvsweb.NetBSD.org}.
-
-\subsubsection*{NetBSD Release Model}
-
-We use NetBSD release cycle terminology throughout this book.
-The following contains an explanation of the NetBSD release model.
-It is a synopsis of the information located at
-\texttt{http://www.NetBSD.org/releases/release-map.html}.
-
-The main development branch or \textit{HEAD} of NetBSD is known as
-\textit{NetBSD-current} or, if NetBSD is implied, simply
-\textit{-current}.  The source code used in this book is
-therefore -current from the aforementioned date.
-
-Release branches are created from -current and are known by their
-major number, for example NetBSD~5.  Release branches get bug fixes
-and minor features, and releases are cut from them at suitable
-dates.  Releases always contain one or more minor numbers, \eg
-NetBSD~5.0.1.  The first major branch after March~31st is NetBSD~6
-and therefore the first release to potentially contain this work
-is NetBSD~6.0.
-
-A -current snapshot contains a kernel API/ABI version.  The version is
-incremented only when an interface changes.  The kernel version
-corresponding to March 31st is 5.99.48.  While this version number
-stands for any -current snapshot between March~9th and April~11th~2011,
-whenever 5.99.48 is used in this book, it stands for -current
-at 20110331.
+Unlike in the original dissertation, we do not define exact revisions
+for the source code we describe in this book.  However, we attempt to
+keep all discussion in such a state that it is fully up-to-date whenever
+a new version of the book is released.
 
 \subsubsection*{Code examples}
 
