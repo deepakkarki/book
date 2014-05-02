@@ -25,7 +25,6 @@
 
 \renewcommand{\ttdefault}{txtt}
 
-\newcommand{\manpageref}[2]{\hyperref[manpage:#1]{manual page \textit{#2} at \pageref{manpage:#1}}}
 \newcommand{\chapref}[1]{\hyperref[chap:#1]{Chapter~\ref{chap:#1}}}
 \newcommand{\eg}{e.g.\ }
 \newcommand{\ie}{i.e.\ }
@@ -94,15 +93,6 @@ dissertation which is available via \textit{http://rumpkernel.org/}.
 
 \bibliographystyle{tkkdiss}
 \bibliography{thebibs}
-
-
-\appendix
-
-
-\section{Manual Pages}
-\manpagetoc
-
-\input{man.tex}
 
 
 \end{document}

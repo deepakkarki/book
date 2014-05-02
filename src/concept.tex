@@ -639,8 +639,8 @@ threads~\cite{anderson:scheduler_activations}.
 
 \item \textbf{bound threads}: the soft context is set in TLS.
 The rump kernel soft context in the host thread's TLS can be set,
-changed and disbanded using interfaces further described in the
-\manpageref{rumplwproc.3}{rump\_lwproc.3}.  We call a thread with the rump
+changed and disbanded using the \verb+rump_lwproc+ interfaces.
+We call a thread with the rump
 kernel soft context set a \textit{bound thread}.  All calls to the rump
 kernel made from a host thread with a bound thread will be executed with
 the same rump kernel soft context.
