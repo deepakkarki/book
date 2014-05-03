@@ -3168,116 +3168,14 @@ question is revisited in Section~\ref{chap:fsperformance}, where
 we compare rump kernel file system performance against an in-kernel mount.
 
 
-\subsection{Hardware Device Drivers: A Case of USB}
-\label{sect:usb}
+\subsection{Hardware Device Drivers}
 
-Hardware device drivers require access to their counterpart to
-function.  This counterpart can either be hardware itself or software
-which emulates the hardware.  Throughout this section our default
-assumption is that the virtualized driver is controlling real hardware.  Hardware
-access means that the hardware must be present on the system where
-the driver is run and that the driver has to have the appropriate
-privileges to access hardware.  Access is typically available only
-when the CPU is operating in privileged (kernel) mode.
-
-The kernel USB driver stack exports USB device access to userspace
-via the USB generic driver, or \textit{ugen}.  After ugen attaches
-to a USB bus node, it provides access to the attached hardware (\ie
-not the entire USB bus) from userspace via the \texttt{/dev/ugen<n>}
-device nodes.  While hardware must still be present, providing
-access via a device node means that any entity on the host with
-the appropriate privileges to access the device node may communicate
-with the hardware.  A key point is that the USB protocol offered
-by ugen is essentially unchanged from the USB hardware protocol.
-This protocol compatibility allows preexisting kernel drivers to use ugen
-without protocol translation.
-
-Our main goal with USB support was to show it is possible to do
-kernel hardware device driver development in userspace.  The two
-subproblems we had to solve were being able to attach drivers to
-the ugen device nodes and to integrate with the device autoconfiguration
-subsystem~\cite{torek:config}.
-
-\subsubsection{Structure of USB}
-
-At the root of the USB bus topology is a \textit{USB host controller}.  It controls
-all traffic on the USB bus.  All device access on the bus is done
-through the host controller using an interface called USBDI, or
-USB Driver Interface.  The role of the host controller, along with ugen,
-is a detail which makes USB especially suitable for userspace drivers:
-we need to implement a host controller which maps USBDI to the ugen
-device node instead of having to care about all bus details.
-
-We implemented a host controller called \textit{ugenhc}.  When
-the kernel's device autoconfiguration subsystem calls the ugenhc
-driver to probe the device, the ugenhc driver tries to open
-\texttt{/dev/ugen} on the host.  If the open is successful, the
-host kernel has attached a device to the respective ugen instance
-and ugenhc can return a successful match.  Next, the ugenhc
-driver is attached in the rump kernel, along with a USB bus and a
-USB root hub.  The root hub driver explores the bus to see which
-devices are connected to it, causing the probes to be delivered
-first to ugenhc and through /dev/ugen to the host kernel and finally
-to the actual hardware.  Figure~\ref{fig:usbdmesg} contains a
-``dmesg'' of a server with four ugenhc devices configured and one
-USB mass media attached.
-
-\begin{figure}
-{\tt \scriptsize
-\begin{verbatim}
-golem> rump_server -lrumpvfs -lrumpdev -lrumpdev_disk -lrumpdev_usb \
-       -lrumpdev_ugenhc -lrumpdev_scsipi -lrumpdev_umass -v unix:///tmp/usbserv
-Copyright (c) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011
-    The NetBSD Foundation, Inc.  All rights reserved.
-Copyright (c) 1982, 1986, 1989, 1991, 1993
-    The Regents of the University of California.  All rights reserved.
-
-NetBSD 5.99.48 (RUMP-ROAST) #0: Mon May  9 21:55:18 CEST 2011
-        pooka@pain-rustique.localhost:/usr/allsrc/cleansrc/sys/rump/librump/rumpkern
-total memory = unlimited (host limit)
-timecounter: Timecounters tick every 10.000 msec
-timecounter: Timecounter "rumpclk" frequency 100 Hz quality 0
-cpu0 at thinair0: rump virtual cpu
-cpu1 at thinair0: rump virtual cpu
-root file system type: rumpfs
-mainbus0 (root)
-ugenhc0 at mainbus0
-usb0 at ugenhc0: USB revision 2.0
-uhub0 at usb0: vendor 0x7275 product 0x6d70, class 9/0, rev 0.00/0.00, addr 1
-uhub0: 1 port with 1 removable, self powered
-ugenhc1 at mainbus0
-usb1 at ugenhc1: USB revision 2.0
-uhub1 at usb1: vendor 0x7275 product 0x6d70, class 9/0, rev 0.00/0.00, addr 1
-uhub1: 1 port with 1 removable, self powered
-ugenhc2 at mainbus0
-usb2 at ugenhc2: USB revision 2.0
-uhub2 at usb2: vendor 0x7275 product 0x6d70, class 9/0, rev 0.00/0.00, addr 1
-uhub2: 1 port with 1 removable, self powered
-ugenhc3 at mainbus0
-usb3 at ugenhc3: USB revision 2.0
-uhub3 at usb3: vendor 0x7275 product 0x6d70, class 9/0, rev 0.00/0.00, addr 1
-uhub3: 1 port with 1 removable, self powered
-Chicony Electronics Chicony Electronics, class 0/0, rev 2.00/1.00, addr 2, uhub0 port 1 not configured
-AuthenTec AuthenTec, class 255/255, rev 1.10/6.21, addr 2, uhub1 port 1 not configured
-umass0 at uhub2 port 1 configuration 1 interface 0
-umass0: Apple Computer product 0x1301, rev 2.00/1.00, addr 2
-umass0: using SCSI over Bulk-Only
-scsibus0 at umass0: 2 targets, 1 lun per target
-sd0 at scsibus0 target 0 lun 0: <Apple, iPod, 2.70> disk removable
-sd0: 968 MB, 30 cyl, 255 head, 63 sec, 2048 bytes/sect x 495616 sectors
-golem>
-\end{verbatim}
-}
-\caption[dmesg of USB pass-through rump kernel with mass media attached]{
-\textbf{dmesg of USB pass-through rump kernel with mass media attached.}
-The mass media is probed from the host's USB ports.
-}
-\label{fig:usbdmesg}
-\end{figure}
+TODO: Introduction to subsection
 
 \subsubsection{Defining Device Relations with Config}
 \label{sect:config}
+
+TODO: make sure this is not USB-specific
 
 Device autoconfiguration~\cite{torek:config} is used to attach
 hardware device drivers in the NetBSD kernel.  A configuration file
@@ -3414,136 +3312,60 @@ media drives.
 \label{fig:scsipiconf}
 \end{figure}
 
-\subsubsection{DMA and USB}
 
-Direct memory access (DMA) allows devices to be programmed to access
-memory directly without involving the CPU.  Being able to freely
-program the DMA controller to read or write any physical memory
-address from an application is a security and stability issue.
-Allowing any unprivileged process to perform DMA on any memory
-address cannot be allowed in a secure and safe environment.  Limiting
-the capability can be accomplished with a hardware IOMMU unit, but
-at least currently they are not available on all standard computer
-systems.
+\subsubsection{A Case of USB}
+\label{sect:usb}
 
-Due to USBDI, USB drivers do not perform DMA operations.  Instead, all DMA
-operations are done by the host controller on behalf of the devices.
-We only need to be able to handle DMA requests in the host controller.
-Since the ugenhc host controller passes requests to the host kernel's
-ugen driver, there is no need to support DMA in a rump kernel
-for the purpose of running unmodified USB drivers.
+The kernel USB driver stack exports USB device access to userspace
+via the USB generic driver, or \textit{ugen}.  After ugen attaches
+to a USB bus node, it provides access to the attached hardware (\ie
+not the entire USB bus) from userspace via the \texttt{/dev/ugen<n>}
+device nodes.  While hardware must still be present, providing
+access via a device node means that any entity on the host with
+the appropriate privileges to access the device node may communicate
+with the hardware.  A key point is that the USB protocol offered
+by ugen is essentially unchanged from the USB hardware protocol.
+This protocol compatibility allows preexisting kernel drivers to use ugen
+without protocol translation.
 
-Drivers will still allocate DMA-safe memory to pass to the host
-controller so that the host controller can perform the DMA operations.
-We must be able to correctly emulate the allocation of this
-memory.  In NetBSD, all modern device drivers use the machine
-independent \textit{bus~dma}~\cite{thorpe:busdma} framework for
-DMA memory.  bus~dma specifies a set of interfaces and
-structures which different architectures and busses must implement
-for machine independent drivers to be able to use DMA memory.
-We implement the bus~dma interface in
-\texttt{sys/rump/librump/rumpdev/rumpdma.c}.
+At the root of the USB bus topology is a \textit{USB host controller}.
+It controls all traffic on the USB bus.  All device access on the bus
+is done through the host controller using an interface called USBDI, or
+USB Driver Interface.  The role of the host controller, along with ugen,
+is a detail which makes USB especially suitable for userspace drivers:
+we need to implement a host controller which maps USBDI to the ugen
+device node instead of having to care about all bus details.
 
-\subsubsection{USB Hubs}
+We implemented a host controller called \textit{ugenhc}.  When
+the kernel's device autoconfiguration subsystem calls the \textit{ugenhc}
+driver to probe the device, the \textit{ugenhc} driver tries to open
+\texttt{/dev/ugen} on the host.  If the open is successful, the
+host kernel has attached a device to the respective ugen instance
+and \textit{ugenhc} can return a successful match.  Next, the \textit{ugenhc}
+driver is attached in the rump kernel, along with a USB bus and a
+USB root hub.  The root hub driver explores the bus to see which
+devices are connected to it, causing the probes to be delivered
+first to \textit{ugenhc} and through \texttt{/dev/ugen} to the host
+kernel and finally to the actual hardware.
 
-\begin{figure}[t]
-\includegraphics[width=0.6\linewidth]{usbhub.pdf}
-\caption[Attaching USB Hubs]{
-\textbf{Attaching USB Hubs.}
-In case a USB hub is attached by the host kernel as \textit{ugen} instead of
-as a hub, devices tree behind the hub will not be visible.
-}
-\label{fig:uhub}
-\end{figure}
+\subsubsection*{Conclusions for USB Approach}
 
-\begin{figure}
-\begin{flushleft}
-host probe:
-{\tt \scriptsize
-\begin{verbatim}
-ugen2 at uhub1 port 1
-ugen2: OnSpec Generic USB Hub
-\end{verbatim}}
+The USB approach is not recommended for hooking device drivers to rump
+kernels.  To implement \textit{ugenhc}, support for the USB protocol
+stack must already exist on the platform.  Even though USB is supported
+by many hosts, the current implementation of \textit{ugenhc} is still
+NetBSD-specific.  Furthermore, we found that though in theory access
+through \texttt{/dev/ugen} is safe, during development we were able to
+tickle the host's USB protocol stack in surprising ways causing host
+kernel panics.  Supposedly, this unstability is caused by the compound
+effect of both the USB protocol stack implementation being huge, and
+accessing it via \texttt{/dev/ugen} not being the frequently exercised
+access path.
 
-rump kernel probe:
-{\tt \scriptsize
-\begin{verbatim}
-ugenhc2 at mainbus0
-usb2 at ugenhc2: USB revision 2.0
-uhub2 at usb2
-uhub2: 1 port with 1 removable
-uhub3 at uhub2 port 1: OnSpec Inc.
-uhub3: 2 ports with 0 removable
-uhub4 at uhub3 port 1: OnSpec Inc.
-uhub5 at uhub3 port 2: OnSpec Inc.
-\end{verbatim}}
-\end{flushleft}
-\caption[USB device probe \textit{without} host HUBs]{
-\textbf{USB device probe \textit{without} host HUBs.}
-}
-\label{fig:uhub_nouber}
-\end{figure}
 
-A ugen can
-access only the specific USB device it is attached to; this prevents
-for example security issues by limiting access to one device
-on the USB bus.  For USB functions, such as mass~memory or audio,
-there are no implications.
-However, USB hubs expose other
-USB devices (functions or other USB hubs) further down the bus.
-If a USB hub is attached as ugen, it is possible to detect that
-devices are attached to the hub, but it is not possible to access
-any devices after the USB hub, including ones directly attached to
-it -- all ugen access will be directed at the hub.  Figure~\ref{fig:uhub}
-illustrates the matter in terms of a device tree, while Figure~\ref{fig:uhub_nouber}
-and Figure~\ref{fig:uhub_uber} present the same situation in terms
-of kernel bootlogs.
-In practice dealing with hubs is not an issue: the host needs to
-prioritized HUBs over ugen.
+\subsubsection{PCI: Big Yellow Bus}
 
-\begin{figure}
-\begin{flushleft}
-host probe:
-{\tt \scriptsize
-\begin{verbatim}
-uhub5 at uhub2 port 1: OnSpec Generic Hub
-uhub5: 2 ports with 0 removable
-ugen2 at uhub5 port 1
-ugen2: Alcor Micro FD7in1
-ugen3 at uhub5 port 2
-ugen3: CITIZEN X1DE-USB
-\end{verbatim}}
-
-rump kernel probe:
-{\tt \scriptsize
-\begin{verbatim}
-ugenhc2 at mainbus0
-usb2 at ugenhc2: USB revision 2.0
-uhub2 at usb2
-umass0 at uhub2
-umass0: Alcor Micro
-umass0: using SCSI over Bulk-Only
-scsibus0 at umass0
-sd0 at scsibus0
-sd0: 93696 KB, 91 cyl, 64 head, 32 sec, 512 bytes/sect x 187392 sectors
-sd1 at scsibus0
-sd1: drive offline
-ugenhc3 at mainbus0
-usb3 at ugenhc3: USB revision 2.0
-uhub3 at usb3
-umass1 at uhub3
-umass1: using UFI over CBI with CCI
-atapibus0 at umass1
-sd2 at atapibus0 drive 0
-sd2: 1440 KB, 80 cyl, 2 head, 18 sec, 512 bytes/sect x 2880 sectors
-\end{verbatim}}
-\end{flushleft}
-\caption[USB device probe \textit{with} host HUBs]{
-\textbf{USB device probe \textit{with} host HUBs.}
-The devices behind the hub are visible.
-}
-\label{fig:uhub_uber}
-\end{figure}
+TODO
 
 
 \clearpage

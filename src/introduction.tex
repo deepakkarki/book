@@ -254,16 +254,10 @@ Each configuration contributes to solving our motivating problems:
 	familiar tools.
 \end{enumerate}
 
-Our implementation supports rump kernels for
-file systems~\cite{kantee:rumpfs}, networking~\cite{kantee:rumpnet}
-and device drivers~\cite{kantee:rumpdev}.
-Both synthetic benchmarks and real world data gathered from a period
-between 2007 and 2011 are used for the evaluation.  We focus our efforts
-at drivers which do not depend on a physical backend being present.  Out
-of hardware device drivers, support for USB drivers has been implemented
-and verified.  We expect it is possible to support generic unmodified
-hardware device drivers in rump kernels by using previously published
-methods~\cite{levasseur:driverreuse}.
+Our implementation supports rump kernels for file systems (\eg FFS),
+networking (\eg TCP/IP) and device drivers (\eg PCI).  Both synthetic
+benchmarks and real world data gathered from a period between 2007 and
+2011 are used for the evaluation.
 
 \subsection{Contributions}
 
