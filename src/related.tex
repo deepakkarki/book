@@ -302,10 +302,7 @@ take care of adjusting the function calling convention, since BSD
 operating systems use a different one from Windows.
 
 The wrapper implementation redefines all structures used by the NDIS
-interface.  It does not introduce any techniques which
-could have been useful solutions when discussing the type
-incompatibility challenges with running NetBSD code in a foreign host
-(Section~\ref{sect:foreignhost}).  The fact that is possible to
+interface.  The fact that is possible to
 define a function interface to attach drivers suggests that
 Windows does not suffer from the inline/macro problems which affect
 our ability to use standard NetBSD kernel modules on non-x86
