@@ -23,6 +23,6 @@ all: ${PAPER}.tex thebibs.bib
 	mv ${PAPER}.pdf ${TARGET}.pdf
 
 clean:
-	rm -f dummy *aux *bbl *blg *dvi *log *.ps *lof *lot *.toc *.ilg *.nls *.nlo ${PAPER}.pdf *.mof inputs.tex ${PAPER}.out
+	rm -f dummy *aux *bbl *blg *dvi *log *.ps *lof *lot *.toc *.ilg *.nls *.nlo ${PAPER}.pdf ${TARGET}.pdf *.mof inputs.tex ${PAPER}.out
 
 cleandir: clean
