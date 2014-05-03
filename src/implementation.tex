@@ -2678,7 +2678,8 @@ A rump component init routine may be created to augment the
 module init routine.
 
 By convention, we place the rump component init routines in the
-component's source directory in a file called \texttt{component.c}.
+component's source directory in a file called \verb+$name_component.c+,
+\eg \verb+bpf_component.c+.
 To define an init routine,  the component should use the
 \verb+RUMP_COMPONENT()+ macro.  The use of this macro serves the
 same purpose as the \verb+MODULE()+ macro and ensures that the init
@@ -2724,9 +2725,18 @@ level & purpose \\
 \hline
 \verb+RUMP_COMPONENT_DEV+ & device components \\
 \hline
+\verb+RUMP_COMPONENT_DEV_AFTERMAINBUS+ & device components run which after
+	the device tree root (\textit{mainbus}) has attached \\
+\hline
 \verb+RUMP_COMPONENT_KERN_VFS+ & base initialization which is done
 	after the VFS faction has attached, e.g. base components which
 	do VFS operations \\
+\hline
+\verb+RUMP_COMPONENT_SYSCALL+ & establish \textit{non-modular} syscalls
+	which are available in the components present \\
+\hline
+\verb+RUMP_COMPONENT_POSTINIT+ & misc. components that attach right before
+	\verb+rump_init()+ returns \\
 \hline
 \end{tabular}
 \caption[Rump component classes]{
@@ -2771,9 +2781,9 @@ RUMP_COMPONENT(RUMP_COMPONENT_NET_IFCFG)
         soclose(so);
 }
 \end{verbatim}}
-\caption[Example: selected contents of \texttt{component.c} for \textit{netinet}]{
-\textbf{Example: selected contents of \texttt{component.c} for
-\textit{netinet}.} The inet domain is attached in one constructor.
+\caption[Example: selected contents of \texttt{netinet\_component.c}]{
+\textbf{Example: selected contents of \texttt{netinet\_component.c}.}
+The inet domain is attached in one constructor.
 The presence of the domain is required for configuring an inet address
 for \texttt{lo0}.  The interface itself is provided and created by the
 \textit{net} component (not shown).
@@ -2787,7 +2797,7 @@ component file will be automatically executed at the appropriate
 times during rump kernel bootstrap so as to ensure that any
 dependent components have been initialized before.  The full source
 code for the file can be found from the source tree path
-\texttt{sys/rump/net/lib/libnetinet/component.c}.  The
+\verb+sys/rump/net/lib/libnetinet/netinet_component.c+.  The
 userspace rc~script \texttt{etc/rc/network} provides the equivalent
 functionality in a regular monolithic NetBSD setup.
 
