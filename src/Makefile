@@ -1,5 +1,3 @@
-#	$Id: Makefile,v 1.14 2012/01/31 21:52:47 pooka Exp $
-#
 
 PAPER=	rumpkernel
 
