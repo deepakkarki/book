@@ -188,9 +188,13 @@ virtualized kernel instances \textit{rump kernels}
 since they retain only a part of the original kernel.  This
 minimalistic approach makes rump kernels fast to bootstrap (\~{ }10ms)
 and introduces only a small memory overhead (\~{ }1MB per instance).
-The implementation we present hosts rump kernels in unprivileged
-user processes on a POSIX host.  The platform that the rump kernel is
-hosted on is called the host platform or \textit{host}.
+
+The platform that the rump kernel is running on is called the host
+platform or \textit{host}.  Examples of supported host platforms include
+userspace processes on most POSIX-like operating systems and the Xen
+hypervisor.  To showcase how rump kernels can be made to run on virtually
+any platform, an experiment was done where rump kernels were compiled
+to javascript (instead of assembly) and ran natively in web browsers.
 
 At runtime, a rump kernel can assume the role of an application library
 or that of a server.  Programs requesting services from rump kernels
