@@ -10,9 +10,7 @@ SUBS+=	evaluation.tex
 SUBS+=	related.tex
 SUBS+=	conclusions.tex
 
-all: ${PAPER}.ps
-	
-${PAPER}.ps: ${PAPER}.tex thebibs.bib
+all: ${PAPER}.tex thebibs.bib
 	rm -f inputs.tex ${PAPER}.pdf
 
 	for s in ${SUBS}; do \
