@@ -1,5 +1,6 @@
 
 PAPER=	rumpkernel
+TARGET=	${PAPER}-PRELIMINARY
 
 SUBS=	introduction.tex
 SUBS+=	concept.tex
@@ -19,6 +20,7 @@ all: ${PAPER}.tex thebibs.bib
 	bibtex ${PAPER}
 	makeindex ${PAPER}.nlo -s nomencl.ist -o ${PAPER}.nls
 	pdflatex ${PAPER}.tex
+	mv ${PAPER}.pdf ${TARGET}.pdf
 
 clean:
 	rm -f dummy *aux *bbl *blg *dvi *log *.ps *lof *lot *.toc *.ilg *.nls *.nlo ${PAPER}.pdf *.mof inputs.tex ${PAPER}.out
