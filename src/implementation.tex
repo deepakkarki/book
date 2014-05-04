@@ -1207,25 +1207,6 @@ memory from the allocators.  We have extracted the implementations
 for these allocators from the standard NetBSD kernel and provide
 them as part of the rump kernel base.
 
-An exception is the 4.3BSD/4.4BSD \texttt{malloc()}~\cite{mckusick:malloc};
-we stress that in this section \textit{malloc} refers to the
-in-kernel implementation of the allocator.  In contrast to the
-dynamic nature of the abovementioned allocators, the malloc
-implementation uses a single contiguous memory range for all
-allocations (\verb+kmem_map+).  The size of this range is calculated
-from total system memory and the range is allocated at system
-bootstrap time.  In a rump kernel this behavior is not desirable,
-since it sets static limits for the system.  Due to this reason we
-did not extract malloc and instead reimplemented the interface by
-relegating requests to the hypercall layer.  Since malloc is being
-retired in NetBSD in favor of the newer style allocators, we did
-not see it necessary to spend effort on being able to extract the
-implementation instead of using the hypervisor's memory allocator
-directly.  Notably, the situation with malloc may need to be revisited
-if rump kernels are to be ported to a host which does not provide
-a general purpose memory allocator in itself and malloc is not
-fully retired by then.
-
 \subsubsection{Pagedaemon}
 
 The NetBSD kernel uses idle memory for caching data.  As long as
