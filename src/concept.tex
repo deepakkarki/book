@@ -272,22 +272,17 @@ one which contains file system support.
 
 \subsubsection{Hosting}
 
-A rump kernel accesses host resources through the \textit{rumpuser} hypercall interface.
-The hypercall layer is currently implemented for POSIX hosts, but there
-is no reason why it could not be adapted to suit alternative hosting
-as well, such as microkernels.  We analyze the requirements for the
-hypercall interface in more detail in Section~\ref{sect:hypercall}.
-Whenever discussing hosting and the hypercall interface we attempt to
-keep the discussion generic and fall back to POSIX terminology only
-when necessary.
+To function properly, a rump kernel must access certain host resources
+such as memory and the scheduler.  These resources are accessed through
+the \textit{rumpuser} hypercall interface.  We will analyze and describe
+this interface in detail in Section~\ref{sect:hypercall}.
 
-The host controls what resources the guest has access to.
-It is unnecessary to run rump kernels as root on POSIX systems ---
-security-conscious people will regard it as unwise as well unless there
-is a very good reason for it.  Accessing resources such as the host file
-system will be limited to whatever credentials the rump kernel runs with
-on the host.  Other resources such as memory consumption may be limited
-by the host as well.
+Notably, as we already hinted in the introduction, the platform
+requirements for a rump kernel are extremely minimal, and a rump kernel
+can run virtually everywhere.  For example, there is no need to run the
+rump kernel in privileged hardware mode.  Ultimately, the host has full
+control and fine-grained control of what a rump kernel has access to.
+
 
 \begin{figure}
 {\tt \scriptsize
