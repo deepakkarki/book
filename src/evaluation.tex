@@ -368,7 +368,7 @@ in kernel code.
 	the code.  Although there is no full support for
 	Valgrind on NetBSD, a Linux host can be used to run
 	the rump kernel.
-	Figure~\ref{fig:valgrind}~\cite{njoly:valgrind} shows an
+	Figure~\ref{fig:valgrind}, contributed by Nicolas Joly, shows an
 	example of a NetBSD kernel bug found with Valgrind on Linux.
 
 	Also, a debugger such as \texttt{gdb} can be used like
@@ -677,7 +677,7 @@ driver development.
 	calls, it goes to reason it should be done as much as
 	possible to minimize the amount of tests that have to be
 	written.  The file system independent testing facility
-	located in \texttt{tests/fs/vfs}~\cite{njoly:vfstest}
+	located in \texttt{tests/fs/vfs}
 	applies the same test to a number of file systems regardless
 	of perceived stability.  If an experimental
 	driver causes a rump kernel crash, the failure is reported and
