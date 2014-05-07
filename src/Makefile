@@ -7,6 +7,7 @@ SUBS+=	concept.tex
 SUBS+=	implementation.tex
 SUBS+=	evaluation.tex
 SUBS+=	related.tex
+SUBS+=	history.tex
 SUBS+=	conclusions.tex
 
 all: ${PAPER}.tex thebibs.bib
