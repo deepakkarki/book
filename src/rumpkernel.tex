@@ -47,6 +47,14 @@
 Copyright (c) 2012, 2014 Antti Kantee\\
 All Rights Reserved
 
+Credits for the original thesis: \\
+Author: Antti Kantee \\
+Supervisor: Prof. Heikki Saikkonen \\
+Preliminary examiners: Dr. Marshall Kirk McKusick, Prof. Renzo Davoli \\
+Opponent: Dr. Peter Tr\"{o}ger \\
+
+{\large PRELIMINARY DRAFT.  DO NOT DISTRIBUTE.}
+
 \begin{preface}
 
 \begin{verse}
@@ -61,13 +69,27 @@ We don't get fooled again\\
 \end{verse}
 
 This document is intended as an up-to-date description on the fundamental
-concepts related to the anykernel and rump kernels.  It is based on
-the dissertation published in 2012: \textit{Flexible Operating System
-Internals: The Design and Implementation of the Anykernel and Rump
-Kernels}.  For now, it is recommended that you stick to reading the
-dissertation which is available via \textit{http://rumpkernel.org/}.
+concepts related to the anykernel and rump kernels.  It is based on the
+dissertation written in 2011 and early 2012: \textit{Flexible
+Operating System Internals: The Design and Implementation of the Anykernel
+and Rump Kernels}.
 
-{\large PRELIMINARY DRAFT.  DO NOT DISTRIBUTE.}
+The major change with rump kernels since the first edition is a shift
+in focus and motivation.  In work leading up to the first edition, rump
+kernels were about running kernel components in userspace.  Since then,
+it has become possible to run complete POSIX-environment application
+stacks on top of rump kernels in most environments, including userspace,
+Xen, Genode and even bare metal.
+
+The second edition will also limit itself to being an architecture
+description, and discussion on use cases of have been removed.  The reader
+is invited to look at \textit{http://repo.rumpkernel.org/} and
+\textit{http://wiki.rumpkernel.org/}.  Furthermore, some of the
+measurements mandated by the original text's academic nature are gone.
+
+However, the second edition is currently not yet finished.  It is
+recommended that you read the original dissertation which is available
+via \textit{http://book.rumpkernel.org/}.
 
 \end{preface}
 
