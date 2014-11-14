@@ -1,0 +1,45 @@
+	Chapter 1: intro
+* rewrite completely
+
+
+	Chapter 2: theory
+* take whole stack into account (intro, 2.1, add 2.x)
+* deemphasize discussion on client types (2.2)
+
+
+	Chapter 3: implementation
+* weak symbols are no longer used (3.1)
+* add section on running in freestanding env (cf. 3.2) and compare to
+  hosted envs
+* add something about pinning rump kernel cpus to host cores?
+  (that still needs some code)
+* we cannot assume MMU anymore (3.4), so change discussion
+* mention libc (3.6), even though it's slightly on a different layer
+* update 3.8 to mention __attribute__((__constructor__)).  also,
+  update RUMP_COMPONENT type table (table 3.4 as of now)
+* section 3.9 needs a lot of work, e.g. new network I/O drivers (dpdk
+  and netmap) and also virtio driver and xen pv i/o drivers.  maybe
+  split it somehow?
+* move 3.10.1 ("defining device relations with config") somewhere else
+
+
+	Chapter 4: Evaluation
+* remove(?)
+
+
+	Chapter 5: Related work
+* integrate relevant pieces into other chapters
+* nuke the rest
+
+
+	Chapter 6: Short history
+* mostly done, need to discuss hijack and adjust "rumprun" terminology
+  and discussion
+
+
+	Chapter 7: Conclusions
+* done'ish
+
+
++ add a whole chapter on build scripts etc.
+  (buildrump.sh and friends)
