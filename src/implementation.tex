@@ -63,7 +63,7 @@ fileops}, \texttt{struct protosw}, etc.) and we could concentrate
 on the exceptions.  Code was divided into functionality groups
 using source modules as boundaries.
 
-The three techniques we used to address problems are as follows:
+The two techniques we used to address problems are as follows:
 
 \begin{enumerate}
 \item   \textbf{code moving}.  This solved cases where a source
@@ -93,26 +93,34 @@ The three techniques we used to address problems are as follows:
 	not present.  At runtime the pointer may be adjusted to
 	point to an actual implementation of the feature if it is
 	present.
-
-\item   \textbf{weak symbols}.  A weak symbol is one which is used
-	in case no other definition is available.  If a non-weak
-	symbol is linked in the same set, it is used and the weak
-	symbol is silently ignored by the linker.  Essentially,
-	weak symbols can be used to provide a default stub
-	implementation.  However, as opposed to function pointers,
-	weak symbols are a linker concept instead of a program
-	concept.  It is not possible to deduce behavior
-	by looking at the code at the callsite.  Unlike a function
-	pointer, using a weak symbol also prevents a program from
-	reverting from a non-weak definition back to a weak
-	definition.  Therefore, the weak symbol technique cannot
-	be used anywhere where code can be unloaded at runtime.
-	We used stub implementations defined by weak symbols very
-	sparingly because of the above reasons and preferred other
-	approaches.
 \end{enumerate}
 
-Finally, to illustrate the problems and techniques, we discuss
+Previously, we also used weak symbol aliases sparingly to provide stub
+implementations which were overriden by the linker if the component
+providing the actual implementation was linked.  Weak aliases were
+found to be problematic with dynamically linked libraries on some
+userspace platforms, \eg Linux with glibc.  In \textit{lazy binding},
+a function is resolved by the dynamic linker only when the function
+is first called, so as to avoid long program startup times due to resolving
+symbols which are never used at runtime.  As a side-effect, lazy binding
+theoretically allows \texttt{dlopen()}'ing libraries which override weak
+aliases as long as the libraries are loaded before the overridden functions
+are first called.  Namely, in the case of rump kernels, loading must
+take place before \verb+rump_init()+ is called.  However, some dynamic
+linkers treat libraries loaded with \texttt{dlopen()} different from
+ones loaded when the binary is executed.  For example, the aforementioned
+glibc dynamic linker overrides weak aliases with symbols from
+\texttt{dlopen()}'d libraries only if the environment variable
+\verb+LD_DYNAMIC_WEAK+ is set.  With some other dynamic linkers,
+overriding weak symbols is not possible at all.  Part of the power of
+rump kernels is the ability to provide a single binary which dynamically
+loads the necessary components at runtime depending on the configuration
+or command line parameters.  Therefore, to ensure that rump kernels work
+the same on all userspace platforms, we took the extra steps necessary
+to remove uses of weak aliases and replace them with the abovementioned
+two techniques.
+
+To illustrate the problems and our necessary techniques, we discuss
 the modifications to the file \verb+sys/kern/kern_module.c+.  The
 source module in question provides support for loadable kernel
 modules (discussed further in Section~\ref{sect:extending}).
