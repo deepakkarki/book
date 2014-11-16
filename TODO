@@ -10,6 +10,8 @@
 	Chapter 3: implementation
 * add section on running in freestanding env (cf. 3.2) and compare to
   hosted envs
+* describe the most recent hypercall interface (3.2.3).  also add
+  text on I/O hypercalls
 * add something about pinning rump kernel cpus to host cores?
   (that still needs some code)
 * we cannot assume MMU anymore (3.4), so change discussion
