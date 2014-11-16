@@ -19,7 +19,6 @@
 * section 3.9 needs a lot of work, e.g. new network I/O drivers (dpdk
   and netmap) and also virtio driver and xen pv i/o drivers.  maybe
   split it somehow?
-* move 3.10.1 ("defining device relations with config") somewhere else
 
 
 	Chapter 4: Evaluation
