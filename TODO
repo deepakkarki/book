@@ -14,8 +14,7 @@
   (that still needs some code)
 * we cannot assume MMU anymore (3.4), so change discussion
 * mention libc (3.6), even though it's slightly on a different layer
-* update 3.8 to mention __attribute__((__constructor__)).  also,
-  update RUMP_COMPONENT type table (table 3.4 as of now)
+* update 3.8 to mention __attribute__((__constructor__))
 * section 3.9 needs a lot of work, e.g. new network I/O drivers (dpdk
   and netmap) and also virtio driver and xen pv i/o drivers.  maybe
   split it somehow?
