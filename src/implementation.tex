@@ -1019,9 +1019,9 @@ rump kernel and its clients are managed by their respective hosts,
 the virtual memory subsystem is conceptually exposed throughout
 the kernel.  For example, file systems are tightly built around
 being able to use virtual memory subsystem data structures to cache
-file data.  To illustrate, the standard way the kernel reads data
-from a file system is to memory map the file, access the mapped
-range, and possibly fault in missing data~\cite{silvers:ubc}.
+file data.  To illustrate, consider the standard way the kernel reads
+data from a file system: memory map the file, access the mapped range,
+and possibly fault in missing data~\cite{silvers:ubc}.
 
 Due to the design choice that a rump kernel does not use (nor
 require) a hardware MMU, the virtual memory subsystem implementation
@@ -1074,36 +1074,6 @@ whenever a lookup is done, the page is deemed as accessed.
 
 \subsubsection{Page Remapping}
 
-A regular NetBSD kernel has the ability to interact with the MMU and
-map physical pages to virtual addresses~\footnote
-{
-	NetBSD itself does not run on hardware without a MMU.
-}.
-Since a rump kernel allocates only anonymous memory from the host,
-it cannot ask the host to remap any of its allocations at least on
-a POSIX system --- there is no interface for mapping anonymous memory
-in multiple places.  Usermode operating systems typically use a
-memory mapped file to represent the physical memory of the virtual
-kernel~\cite{dike:uml,eco:vkernel}.  The file acts as a handle and
-can be mapped to the location(s) desired by the usermode kernel
-using the \texttt{mmap()} system call.  The DragonFly usermode
-\textit{vkernel} uses special host system calls to make the host kernel
-execute low level mappings~\cite{eco:vkernel}.
-
-Using a file-backed solution is in conflict with the lightweight
-fundamentals of rump kernels.  First, the file must be created at
-a path specified either by a configuration option or by a system
-guess.  Furthermore, it disrupts the dynamic memory principle we
-have laid out.  While it is relatively simple to extend the file
-to create more memory on demand, it is difficult to
-truncate the file in case the memory is no longer needed
-because free pages will not automatically reside in a contiguous
-range at the end of the file.  Finally, the approach requires
-virtual memory mapping support from the host and limits the
-environments a rump kernel can be theoretically hosted in.  Therefore,
-we should critically examine if memory mapping capability is really
-needed in a rump kernel.
-
 In practice, the kernel does not map physical pages in driver code.
 However, there is one exception we are interested in: the file
 system independent vnode pager.  We will explain the situation in
@@ -1143,26 +1113,8 @@ feature, there are three options for dealing with \verb+uvm_pagermapin()+:
 	consecutive addresses.
 
 \item   Accept that memory remapping support is necessary in a rump
-	kernel and handle the vnode pager using \texttt{mmap()}
-	and \texttt{munmap()}.
+	kernel.
 \end{enumerate}
-
-When comparing the first and the second option, the principle used
-is that memory I/O is several orders of magnitude faster than device
-I/O.  Therefore, anything which affects device I/O should be avoided,
-especially if it might cause extra I/O operations and thus option~1
-is preferable over option~2.
-
-To evaluate the first option against third option, we simulated
-pager conditions and measured the amount of time it takes to
-construct a contiguous 64kB memory window out of non-contiguous
-4kB pages and to write the window out to a file backed by a memory
-file system.  The result for 1000 loops as a function of
-non-contiguous pages is presented in Figure~\ref{fig:copyvsmmap}.
-We conclude that not only is copying the technologically preferred
-option since it avoids the need for memory mapping support on the
-host, it is also several times faster than
-\texttt{mmap()}/\texttt{munmap()} pairs.
 
 It should be noted that a fourth option is to implement a separate
 vnode pager which does not rely on mapping pages.  This option was our
@@ -1174,6 +1126,28 @@ and 14 different flags.  The lesson learnt from this attempt with
 the vnode pager reflects our premise for the entire work: it is
 easy to write superficially working code, but getting all corner
 cases right for complicated drivers is extremely difficult.
+
+So which of the three options is the best?  When comparing the first
+and the second option, the principle used is that memory I/O is several
+orders of magnitude faster than device I/O.  Therefore, anything which
+affects device I/O should be avoided, especially if it might cause extra
+I/O operations and thus option~1 is preferable over option~2.
+
+To evaluate the first option against third option, let us ignore
+MMU-less environments where page remapping is not possible, and
+consider an environment where it is possible albeit clumsy: userspace.
+Usermode operating systems typically use a memory mapped file to represent
+the physical memory of the virtual kernel~\cite{dike:uml,eco:vkernel}.
+The file acts as a handle and can be mapped to the location(s) desired by
+the usermode kernel using the \texttt{mmap()} system call.  The DragonFly
+usermode \textit{vkernel} uses special host system calls to make the
+host kernel execute low level mappings~\cite{eco:vkernel}.
+
+We simulated pager conditions and measured the amount of time it takes to
+construct a contiguous 64kB memory window out of non-contiguous 4kB pages
+and to write the window out to a file backed by a memory file system.
+The result for 1000 loops as a function of non-contiguous pages is
+presented in Figure~\ref{fig:copyvsmmap}.
 
 \begin{figure}[t]
 \includegraphics{copyvsmmap}
@@ -1187,6 +1161,12 @@ pages.  With remapping, each disjoint region requires a separate
 call to \texttt{mmap()}.}
 \label{fig:copyvsmmap}
 \end{figure}
+
+The conclusion is that without direct access to a MMU, page remapping is
+either slower than memory copy or impossible.  The downside of memory
+copy is that in low-memory environments you need twice the amount of
+memory of the largest allowed pager window size.  The simple choice is
+to restrict pager window size.
 
 \subsubsection{Memory Allocators}
 \label{sect:malloc}
