@@ -2,8 +2,8 @@
 \section{Related Work}
 \label{chap:related}
 
-This chapter surveys and compares work related to the anykernel
-architecture and rump kernels.
+This chapter is destined to be integrated into other chapters and
+to be removed! (TODO)
 
 \subsection{Running Kernel Code in Userspace}
 
@@ -110,36 +110,6 @@ production quality file servers on top of the puffs~\cite{kantee:puffs}
 cooperative multitasking model, we disagree about concurrent data
 access being easier in a model without implicit thread scheduling ---
 concurrency still needs to be handled.
-
-\subsection{Plan 9}
-
-Plan~9~\cite{pike:plan9} made the idea ``everything is a file''
-reality.  Everything in Plan~9 is accessed through the file interface.
-Kernel devices are driven by \textit{walking} the file name namespace
-to obtain a handle and then doing read and write operations on the
-handle.  In most cases the control protocol is text, although there
-are some exceptions for efficiency reasons, such as the frame
-buffer.  Remote resources can be attached to a process's view of
-the file namespace.  The side-effect of this file-oriented operation is that distributed
-computing is implied; from the application perspective
-everything looks the same, regardless of whether the resource is local
-or remote.  Since the communication protocol is text, there are no incompatibilities
-in binary representation between various machine types.  However,
-the practical implication is that the whole system must be built
-from ground up to conform to the paradigm.
-
-We showed with our remote clients that a Unix system is capable of
-limited distributed operation without having to rewrite drivers or
-build the entire OS from ground up.  The limitation is that the
-current system call interface carries many binary subprotocols
-which are incompatible between heterogeneous hosts.  Also, not all
-standard system calls that applications can expect are supported,
-\texttt{mmap()} being the canonical example --- memory mapping
-cannot be extended to a distributed environment without the interface
-contract toward the application being severed.  We do not claim
-that our result is as flexible as the one offered by Plan~9, but
-we do argue that it offers 98\% of the practical functionality with
-2\% of the effort.
 
 \subsection{Namespace Virtualization}
 
@@ -332,6 +302,7 @@ kernel infrastructure does not currently support hardware device drivers
 in the general case.  Still, there is no reason why it could not be done
 on systems with IOMMU support.
 
+
 \subsection{Testing and Development}
 
 Sun's ZFS file system ships with a userspace testing library,
@@ -353,33 +324,3 @@ Section~\ref{sect:testingstudies}) required roughly 30 minutes of
 work and 30 lines of code.
 Using a rump kernel it is possible to test the entire driver
 stack in userspace from system call to VFS layer to ZFS implementation.
-
-\subsection{Single Address Space OS}
-
-As the name suggests, a Single Address Space OS (SASOS) runs entirely
-in a single virtual memory address space, typically 64bit, with
-different applications located in different parts of the address
-space.  The single system-wide address space is in contrast to the approach where each process runs
-in its own address space.  Protection between applications can
-be provided either by the traditional memory management
-hardware approach~\cite{chase:sasosprot,heiser:mungi} or by means
-of software-isolated processes (SIP)~\cite{hunt:singularity}.
-
-A rump kernel with local clients is essentially a SASOS.  It is
-possible to use multiple process contexts against the local rump
-kernel with the \verb+rump_lwproc+ interfaces.  The difference to
-the abovementioned SASOSs is that the runtime enforces neither fair
-scheduling nor protection between these process contexts.  In other
-words, everything is based on cooperation.  For our case cooperation is
-a reasonable assumption, since all processes are provided by the
-same binary.
-
-Another ``single address space'' limitation we had to overcome was
-having the kernel and application in a joint symbol namespace.
-Any symbols exported both by the application portion
-and the kernel, \eg \verb+printf()+, would cause a collision.
-While there are SASOS solutions which, among other things, handle
-similar symbol collision problems~\cite{deller:sasoslink}, they
-require modifications to the linking and loading procedure.  Since
-we wanted things to work out-of-the-box on a Unix-style system, we
-opted for the renaming approach (Section~\ref{chap:rumpns}).
