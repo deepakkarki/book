@@ -390,166 +390,115 @@ the kernel.  Therefore, we can solve the problem by defining that
 it does not exist in our model --- if there are any it is a failure
 in modifying the OS to support rump kernels.
 
-\subsubsection{The Hypercall Interface}
+\subsubsection{The Hypercall Interface(s)}
 \label{sect:hypercall}
 
-The hypercall library implements the hypercall interface for the
-particular host.  On a POSIX host, the library is called
-\texttt{librumpuser} and the source code can be found from
-\texttt{lib/librumpuser}.  For historical reasons, the interface
-itself is also called \textit{rumpuser}, although for example
-\textit{rumphyper} would be a more descriptive name.
+The hypercall interfaces allow a rump kernel to access host platform
+resources and integrate with the platform.  For example allocating
+memory for the rump kernel and the blocking and running of threads is
+accomplished via the hypercall interface.
 
-As an example of a hypercall implementation we consider allocating
-``physical'' memory from the host.  This hypercall is implemented
-by the hypercall library with a call to \verb+posix_memalign()+\footnote
-{
-	\texttt{posix\_memalign()} is essentially \texttt{malloc()}, but
-	it takes an alignment parameter in addition to the size
-	parameter.  Kernel code assumes that allocating a page of
-	memory will return it from a page-aligned offset, and
-	using \texttt{posix\_memalign()} instead of \texttt{malloc()}
-	allows to guarantee that memory allocated by the hypercall
-	will be page-aligned.
-}.
-Conversely, the hypercall for releasing memory back to the system
-is implemented with a call to \verb+free()+.
-
-Theoretically, a rump kernel can accomplish this by calling the host
-directly.  However, there are a number of reasons a separate
-hypercall interface is better.
-
-\begin{enumerate}
-
-\item The user namespace is not available in the kernel.
-To for example make the \verb+posix_memalign()+ call,
-the rump kernel has to define the prototype for the function itself.
-If the prototype matches what libc expects, the call is correctly
-resolved at link time.  The downside is that duplicated information
-can always go out-of-date.  Furthermore, calling out of the kernel
-is not directly possible due to the symbol renaming we presented
-in Section~\ref{chap:rumpns}.
-
-\item A separate interface helps when hosting a rump kernel on a platform
-which is not native to the rump kernel version.  For example,
-while all POSIX platforms provide
-\verb+stat(const char *path, struct stat *sb)+, there is no standard
-for the binary representation of \verb+struct stat+.  Therefore, a
-reference to the structure cannot be passed over the interface as
-binary data, since the representation might not be the same in the kernel
-and the hypercall library.  Even different versions of NetBSD have
-different representations, for example due to increasing \verb+time_t+
-from 32bit to 64bit.  Therefore, to have a well-defined interface
-when running on a non-native host, the hypercall interface should
-only use data types which are the same regardless of ABI.  For
-example, the C99 constant width type \verb+uint64_t+ is preferred
-over \verb+time_t+.  Since the hypercall executes in the same
-process as the rump kernel, byte order is not an issue, and the
-native one can be used.
-
-\item A separate interface helps future investigation of running
-rump kernels on non-POSIX platforms, such as microkernels.
-This investigation, however, will require adjustments to the
-hypercall interface.  While the need for adjustments is foreseeable,
-the exact forms of the adjustments are not, and that is the reason
-they are not already in place.
-\end{enumerate}
-
-The header file \texttt{sys/rump/include/rump/rumpuser.h} defines the
-hypercall interfaces.  All hypercalls by convention begin with the string
-``rumpuser''.  This prevents hypercall interface references in the rump
-kernel from falling under the jurisdiction of symbol renaming.
-
-We divide the hypercall interfaces into mandatory and optional ones.
-The routines that \textbf{must} be implemented by the rumpuser library
-are:
+Historically, all hypercalls were globally implemented by a single
+library.  This was found to be inflexible for I/O devices for two reasons:
 
 \begin{itemize}
+\item	Different I/O devices have different requirements.  Imagine
+	the hypercalls for a network interface necessary to send and
+	receive packets.  If you imagined a PCI network interface
+	card, the necessary hypercalls are completely different from
+	if you imagined \texttt{/dev/tap} or netmap~\cite{rizzo:netmap}.
+	With a growing number of different I/O devices being supported,
+	codifying the different requirements under a compact, fast and
+	understandable interface was not seen to be reasonably possible.
+
+\item	Not all platforms require all I/O devices to be supported.
+	Globally pooling all hypercalls together obfuscates what is
+	the minimal required set of hypercall functionality to run rump
+	kernel on a given platform with a given set of I/O devices.
+\end{itemize}
+
+Therefore, there are now two types of hypercalls: main hypercalls,
+which are always required by every rump kernel, and I/O hypercalls,
+which allow given types of I/O drivers to operate.  The main hypercall
+interface is a single, stable and versioned interface.  The I/O hypercalls
+are private to the I/O bus or the I/O driver, and an implementation is
+required only if the component using the hypercall is linked into the
+rump kernel.  The versioning of I/O hypercalls and changes to them are
+up to individual drivers, and for example over the course of optimizing
+networking packet processing performance, we made several tweaks to the
+hypercalls used by the virtual packet I/O drivers
+(Section~\ref{sect:networking}).  These changes provided for example
+the ability to deliver packets in bursts and zero-copy processing.
+
+For the remainder of this section we will describe the main hypercall
+interface.  Various I/O hypercall interfaces are discussed later in this
+document in conjuction with the I/O systems.
+
+
+\subsubsection*{Main hypercalls}
+
+For the historical reason of rump kernels initially running in userspace,
+the hypercall interface is called \textit{rumpuser}; for example
+\textit{rumphyper} would be a more descriptive name, but changing it
+now brings unnecessary hassle.  The version of the hypercall revision
+we describe here is 17.  In reality, version 17 means the second stable
+rendition of the interface, as during initial development the interface
+was changed frequently and the version bumped often.  The canonical
+implementation for the interface is the POSIX platform
+implementation, currently found from \texttt{lib/librumpuser} in
+the NetBSD tree.  Implementations for other platforms are found from
+\texttt{http://repo.rumpkernel.org/}, and also from 3rd parties.
+
+As an example of a hypercall, we consider allocating memory from the host.
+A hypercall is the only way that a rump kernel can allocate memory at
+runtime.  Notably, though, in the fastpath case the hypercall is used
+to allocate page-sized chunks of memory, which are then dosed out by
+pool and slab allocators in the rump kernel.  The signature of the memory
+allocation hypercall is the following:
+
+{\small
+\begin{verbatim}
+int	rumpuser_malloc(size_t howmuch, int alignment, void **retp);
+\end{verbatim}}
+
+Like all hypercalls which can fail, this hypercall also returns 0
+for success or an error otherwise.  If successful, the call will have
+allocated \texttt{howmuch} bytes of memory and returns a pointer to that
+memory in \texttt{retp}.  The pointer is guaranteed to be aligned to
+\texttt{alignment} bytes.  For example on POSIX the implementation of
+this interface is a call to \verb+posix_memalign()+ or equivalent.
+
+The header file \texttt{sys/rump/include/rump/rumpuser.h} defines the
+hypercall interface.  All hypercalls by convention begin with the string
+``rumpuser''.  This naming convention prevents hypercall interface
+references in the rump kernel from falling under the jurisdiction of
+symbol renaming.
+
+The hypercalls required to run rump kernels can be categorized into the
+following groups:
+
+\begin{itemize}
+\item	\textbf{initialization}: bootstrap the hypercall layer and check
+	that the rump kernel hypercall version matches a version
+	supported by the hypercall implementation.  This interface is
+	called as the first thing when a rump kernel initializes.
 \item   \textbf{memory management}: allocate aligned memory, free
 \item	\textbf{thread management}: create and join threads, TLS access
 \item   \textbf{synchronization routines}: mutex, read/write lock,
-	condition variable.  This class is illustrated in
-	Figure~\ref{fig:rulock}.
-\item   \textbf{exit}: terminate the host container.
-	In a POSIX environment depending on the parameters termination is
-	done by calling either \texttt{abort()} or \texttt{exit()}.
+	condition variable.
+\item	\textbf{time management}: get clock value, suspend execution of
+	calling thread for the specified duration
+\item	\textbf{exit}: terminate the platform.  Notably, in some
+	cases it is not possible to implement this fully, e.g. on
+	bare metal platforms without software power control.  In that
+	case, a best effort approximation should be provided.
 \end{itemize}
 
-\begin{figure}[t]
-{\tt \scriptsize
-\begin{verbatim}
-void rumpuser_mutex_init(struct rumpuser_mtx **);
-void rumpuser_mutex_init_kmutex(struct rumpuser_mtx **);
-void rumpuser_mutex_enter(struct rumpuser_mtx *);
-int  rumpuser_mutex_tryenter(struct rumpuser_mtx *);
-void rumpuser_mutex_exit(struct rumpuser_mtx *);
-void rumpuser_mutex_destroy(struct rumpuser_mtx *);
-struct lwp *rumpuser_mutex_owner(struct rumpuser_mtx *);
-
-void rumpuser_rw_init(struct rumpuser_rw **);
-void rumpuser_rw_enter(struct rumpuser_rw *, int);
-int  rumpuser_rw_tryenter(struct rumpuser_rw *, int);
-void rumpuser_rw_exit(struct rumpuser_rw *);
-void rumpuser_rw_destroy(struct rumpuser_rw *);
-int  rumpuser_rw_held(struct rumpuser_rw *);
-int  rumpuser_rw_rdheld(struct rumpuser_rw *);
-int  rumpuser_rw_wrheld(struct rumpuser_rw *);
-
-void rumpuser_cv_init(struct rumpuser_cv **);
-void rumpuser_cv_destroy(struct rumpuser_cv *);
-void rumpuser_cv_wait(struct rumpuser_cv *, struct rumpuser_mtx *);
-int  rumpuser_cv_timedwait(struct rumpuser_cv *, struct rumpuser_mtx *,
-                           int64_t, int64_t);
-void rumpuser_cv_signal(struct rumpuser_cv *);
-void rumpuser_cv_broadcast(struct rumpuser_cv *);
-int  rumpuser_cv_has_waiters(struct rumpuser_cv *);
-\end{verbatim}}
-\caption[Hypercall locking interfaces]{\textbf{Hypercall locking interfaces}.
-These interfaces use opaque lock data types to map NetBSD kernel locking
-operations to hypervisor operations.
-}
-\label{fig:rulock}
-\end{figure}
-
-Strictly speaking, the necessity of thread support and locking
-depends on the drivers being executed.  We offer the following
-anecdote and discussion.  At one point when working on rump kernel
-support, support for \textit{gdb} in NetBSD was broken so that
-threaded programs could not be single-stepped (the problem has
-since been fixed).  As a way to work around the problem, the variable
-\verb+RUMP_THREADS+ was created.  If it is set to \texttt{0}, the
-rump kernel silently ignores kernel thread creation requests.
-Despite the lack of threads, for example file system drivers still
-function, because they do not directly depend on worker threads.
-The ability to run without threads allowed attaching the broken debugger
-to rump kernels and single-stepping them.
-
-The following rumpuser interfaces called from a rump kernel can
-provide added functionality.  Their implementation is optional.
+There are also a number of optional hypercalls, which are not strictly
+speaking required in all cases, but are nevertheless part of core
+functionality:
 
 \begin{itemize}
-\item   \textbf{host file access and I/O}: open, read/write.  Host I/O
-	is necessary if any host resources are to be accessed via
-	files.  Examples include accessing a file containing a file
-	system image or accessing a host device via \texttt{/dev}.
-\item   \textbf{I/O multiplexing}: strictly speaking, multiplexing
-	operations such as \texttt{poll()} can be handled with
-	threads and synchronous I/O operations.  However, it is
-	often more convenient to multiplex, and additionally it
-	has been useful in working around at least one host
-	system bug\footnote{
-		rev 1.11 of \texttt{sys/rump/net/lib/libvirtif/if\_virt.c}.
-	}.
-\item   \textbf{scatter-gather I/O}: can be used for optimizing
-	the virtual network interface to transmit data directly
-	from \textit{mbufs}\cite{stevens:tcpip2}.
-\item   \textbf{symbol management and external linking}: this is
-	akin to the task of a bootloader/firmware in a regular
-	system, and is required only if dynamically extending the
-	rump kernel is desired (see Section~\ref{sect:extending}).
-\item   \textbf{host networking stack access}: this is necessary
-	for the \textit{sockin} protocol module
-	(Section~\ref{sect:networking}).
 \item   \textbf{errno handling}: If system calls are to be made,
 	the hypervisor must be able to set a host thread-specific
 	\textit{errno} so that the client can read it.
