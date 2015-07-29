@@ -1,5 +1,31 @@
+The currently planned chapters:
+
+	Chapter 1: intro
+		+ DONE'ish (but not committed)
+
+	Chapter 2: theory of rump kernels
+
+	Chapter 3: implementation of rump kernels
+
+	Chapter 4: wider rump kernel ecosystem (buildrump.sh, rumprun,
+	           rumpctrl, drv-foo)
+		+ not even started
+
+	Chapter 5: short history
+		+ mostly done, need to discuss hijack and adjust
+		  "rumprun" terminology and discussion
+
+	Chapter 6: conclusions
+		+ DONE'ish
+
+
+
+
+The TODO for chapters from the first edition:
+
 	Chapter 1: intro
 * rewrite completely
+  + mostly written (but not yet committed)
 
 
 	Chapter 2: theory
@@ -27,14 +53,5 @@
 * nuke the rest
 
 
-	Chapter 6: Short history
-* mostly done, need to discuss hijack and adjust "rumprun" terminology
-  and discussion
-
-
-	Chapter 7: Conclusions
+	Chapter 6: Conclusions
 * done'ish
-
-
-+ add a whole chapter on build scripts etc.
-  (buildrump.sh and friends)
