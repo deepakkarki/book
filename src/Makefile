@@ -1,6 +1,7 @@
 
 PAPER=	rumpkernel
-TARGET=	${PAPER}-PRELIMINARY
+DATE:=	$(shell git show -s --format="%ci" HEAD | sed 's/-//g;s/ .*//')
+TARGET=	${PAPER}-PRELIMINARY-${DATE}
 
 SUBS=	introduction.tex
 SUBS+=	concept.tex
