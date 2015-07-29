@@ -6,6 +6,7 @@ TARGET=	${PAPER}-PRELIMINARY-${DATE}
 SUBS=	introduction.tex
 SUBS+=	concept.tex
 SUBS+=	implementation.tex
+SUBS+=	ecosystem.tex
 SUBS+=	evaluation.tex
 SUBS+=	related.tex
 SUBS+=	history.tex
