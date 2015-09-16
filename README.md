@@ -11,3 +11,11 @@ Hopefully, it can also be offered as a nominally priced printed
 version for those interested in reading a hardcopy.  Please contact
 pooka@rumpkernel.org if you have good experiences in offering tech books
 via print-on-demand shops.
+
+If you wish to encourage finishing the second edition sooner rather
+than later, you can donate a sum of your choice to antti.kantee@iki.fi
+(the author).  _Donors of 50 EUR and over will be credited in the book
+unless they __specifically request__ to be anonymous._  In any case, the
+second edition will be finished and will be free ("free" as in "free beer").
+<br>
+[![donate](donate.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=X3ZJN3WJCTD78&lc=FI&item_number=rumpkernel_bluebookv2&currency_code=EUR)
