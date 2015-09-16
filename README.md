@@ -9,7 +9,7 @@ Meanwhile, read the [original](http://lib.tkk.fi/Diss/2012/isbn9789526049175/isb
 The second edition will be published as a free-to-download pdf.
 Hopefully, it can also be offered as a nominally priced printed
 version for those interested in reading a hardcopy.  Please contact
-[Antti Kantee](pooka@rumpkernel.org) if you have good experiences in
+antti.kantee@iki.fi if you have good experiences in
 offering tech books via print-on-demand shops.
 
 If you wish to encourage finishing the second edition sooner rather
