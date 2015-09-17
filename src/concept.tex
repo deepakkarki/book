@@ -80,14 +80,13 @@ the optimal approach, as we will demonstrate throughout this book.
 \subsection{An Ultralightweight Virtual Kernel for Drivers}
 \label{sect:conceptintro}
 
+TODO: move this section to the intro
+
 Virtualization of the entire operating system can done either by
 modifying the operating system kernel by means of paravirtualization
 (\eg User-Mode Linux~\cite{dike:uml} or Xen~\cite{barham:xen}) or by virtualizing at the
 hardware layer so than an unmodified operating system can be run
-(by using \eg QEMU~\cite{bellard:qemu}).  From the perspective of
-the host, virtualization provides both multiplicity and isolation
-of the monolithic kernel, and can be seen as a possible solution
-for our security and testing challenges from Section~\ref{sect:challenge}.
+(by using \eg QEMU~\cite{bellard:qemu}).
 Using a fully virtualized OS as an application library is less
 straightforward, but can be done by bootstrapping a guest instance
 of an operating system and communicating with the guest's kernel
@@ -128,6 +127,8 @@ functionality necessary for solving a
 problem~\cite{lampson:bestpaperever}.
 
 \subsubsection{Partial Virtualization and Relegation}
+
+TODO: no longer matches current reality
 
 A key observation in our lightweight approach is that part of the
 supporting functionality required by drivers is readily provided
